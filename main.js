@@ -26,7 +26,7 @@ async function getConfig() {
   const useNgrok = (await ask(rl, 'Use ngrok for public hosting? (y/n): ')).toLowerCase() === 'y';
   let authtoken = null;
 
-  if (useNgrok) {
+  if (useNgrok) { 
     authtoken = await ask(rl, 'Enter your ngrok auth token: ');
   }
 
@@ -93,6 +93,7 @@ wss.on('connection', (ws) => {
 
       case 'update_time':
         state.time = message.time;
+        // Broadcast so followers get the update immediately via message listener
         broadcast({ type: 'sync_time', time: state.time }, ws);
         break;
 
