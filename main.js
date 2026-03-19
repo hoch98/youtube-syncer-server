@@ -45,13 +45,11 @@ if (config.useNgrok) {
     throw new Error('ngrok auth token is missing. Delete config.json and restart to reconfigure.');
   }
 
-  // Basic format check — ngrok tokens start with 2 and are long strings
   if (!/^[a-zA-Z0-9_-]{20,}$/.test(config.authtoken)) {
     throw new Error(`ngrok auth token looks invalid: "${config.authtoken}". Delete config.json and restart to reconfigure.`);
   }
 }
 
-// Only import ngrok if needed
 let ngrok = null;
 if (config.useNgrok) {
   ngrok = (await import('@ngrok/ngrok')).default;
@@ -93,7 +91,6 @@ wss.on('connection', (ws) => {
 
       case 'update_time':
         state.time = message.time;
-        // Broadcast so followers get the update immediately via message listener
         broadcast({ type: 'sync_time', time: state.time }, ws);
         break;
 
@@ -108,7 +105,7 @@ wss.on('connection', (ws) => {
         state.time = 0;
         state.paused = false;
         console.log('Video cleared');
-        broadcast({ type: 'sync_cleared' }, ws);
+        broadcast({ type: 'sync_cleared' });
         break;
 
       case 'ping':
@@ -150,12 +147,5 @@ if (config.useNgrok) {
     throw new Error(`Failed to start ngrok tunnel: ${err.message}\nYour auth token may be invalid. Delete config.json and restart to reconfigure.`);
   }
 } else {
-  const { networkInterfaces } = await import('os');
-  const nets = networkInterfaces();
-  const localIp = Object.values(nets)
-    .flat()
-    .find(n => n.family === 'IPv4' && !n.internal)?.address || 'localhost';
-
-  console.log(`Socket server running on ws://${localIp}:${PORT}`);
-  console.log(`Join code: ${localIp}:${PORT}`);
+  console.log(`Socket server running on port ${PORT}`);
 }
