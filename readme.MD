@@ -1,4 +1,4 @@
-#youtube-syncer server
+# youtube-syncer server
 
 Application for hosting the servers for the youtube-syncing extension
 
